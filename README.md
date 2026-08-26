@@ -13,6 +13,8 @@ directly from the website.
 
 ## Install
 
+### Manual
+
 1. Download `inventexplorer.zip` from the [latest release](https://github.com/solidinvent-dev/inventexplorer/releases/latest).
 2. Unzip it into `<vault>/.obsidian/plugins/` — the archive contains the
    `inventexplorer/` folder.
@@ -21,11 +23,26 @@ directly from the website.
 
 Installing on mobile? `INSTALL.md` inside the zip covers it.
 
-**Use the zip, not the loose files.** The plugin loads its icon sets from an
-`icon-sets/` folder that sits next to `main.js`, so an install assembled from
-individual files ends up without Tabler, Boxicons and Phosphor. Lucide and
-emoji keep working, but the rest silently goes missing. For the same reason
-BRAT cannot install this plugin — it only fetches loose files.
+### With BRAT
+
+[BRAT](https://github.com/TfTHacker/obsidian42-brat) installs the plugin from
+this repository and keeps it updated automatically:
+
+1. Install BRAT from Obsidian's community plugins.
+2. *Add beta plugin* → `solidinvent-dev/inventexplorer`.
+
+Each release also carries `main.js`, `manifest.json` and `styles.css` as loose
+files, which is what BRAT reads.
+
+**About the icon sets.** BRAT only ever fetches those three files, and the icon
+sets are 10 MB, so they are not part of a BRAT install. The plugin downloads
+whichever set you pick from this release the first time you use it and keeps it
+next to `main.js` — the same place the zip would have put it. Lucide and emoji
+never depend on that and work regardless.
+
+This makes a BRAT install *smaller* than the zip rather than poorer: it starts
+at 255 KB and only fetches the one set you actually chose, where the zip carries
+all three whether you want them or not.
 
 ## Versions
 
