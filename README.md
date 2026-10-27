@@ -22,6 +22,12 @@ Building from source: `npm ci && npm run build` produces `main.js`.
 
 ## Install
 
+### From Obsidian
+
+InventExplorer is in Obsidian's [community directory](https://community.obsidian.md/plugins/inventexplorer):
+Settings → Community plugins → **Browse**, search for **InventExplorer**, then
+**Install** and **Enable**. Updates come the same way as for any other plugin.
+
 ### Manual
 
 1. Download `inventexplorer.zip` from the [latest release](https://github.com/solidinvent-dev/inventexplorer/releases/latest).
@@ -43,13 +49,14 @@ this repository and keeps it updated automatically:
 Each release also carries `main.js`, `manifest.json` and `styles.css` as loose
 files, which is what BRAT reads.
 
-**About the icon sets.** BRAT only ever fetches those three files, and the icon
-sets are 10 MB, so they are not part of a BRAT install. The plugin downloads
+**About the icon sets.** Obsidian's plugin browser and BRAT only ever fetch
+those three files, and the icon sets are 10 MB, so they are not part of such an
+install. The plugin downloads
 whichever set you pick from this release the first time you use it and keeps it
 next to `main.js` — the same place the zip would have put it. Lucide and emoji
 never depend on that and work regardless.
 
-This makes a BRAT install *smaller* than the zip rather than poorer: it starts
+This makes such an install *smaller* than the zip rather than poorer: it starts
 at 255 KB and only fetches the one set you actually chose, where the zip carries
 all three whether you want them or not.
 
@@ -77,7 +84,7 @@ Prices are on the website.
 - **Network use.** Each connection below happens only in the situation
   described:
   - **Icon set download** — when you first pick an icon from a set that is
-    not on disk (a BRAT install ships without them), the plugin downloads that
+    not on disk (an install from the community directory or BRAT ships without them), the plugin downloads that
     set from this repository's release for your version, once, and keeps it
     next to `main.js`.
   - **License standing check** — once a day, only after a license is
