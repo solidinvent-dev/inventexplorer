@@ -59,15 +59,19 @@ Every release is tagged and stays available, so you can roll back. The
 [latest release](https://github.com/solidinvent-dev/inventexplorer/releases/latest)
 is always the current version.
 
-## Free and paid
+## Free, or one lifetime license
 
-The plugin is fully functional for free with capacity limits — see the website
-for what those are and what a license lifts. A license is a one-time purchase,
-not a subscription.
+- **Free** — icons on 100 files and folders, Lucide and every emoji, a
+  14-colour palette, collapsed/expanded folder icons, one regex path mask.
+- **Lifetime license** — one payment, no subscription: unlimited icons and
+  masks, the Tabler, Boxicons and Phosphor sets, any CSS colour, global
+  defaults, text and explorer styling, on all your vaults and devices.
+
+Prices are on the website.
 
 ## Disclosures
 
-- **Payment.** Full capacity requires a paid license (one-time purchase, sold
+- **Payment.** Full capacity requires a lifetime license (one payment, sold
   through Paddle). No account is needed: a license is an email address and a
   key, checked on your device.
 - **Network use.** Each connection below happens only in the situation
