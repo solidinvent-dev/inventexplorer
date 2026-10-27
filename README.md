@@ -56,6 +56,30 @@ The plugin is fully functional for free with capacity limits — see the website
 for what those are and what a license lifts. A license is a one-time purchase,
 not a subscription.
 
+## Disclosures
+
+- **Payment.** Full capacity requires a paid license (one-time purchase, sold
+  through Paddle). No account is needed: a license is an email address and a
+  key, checked on your device.
+- **Network use.** Each connection below happens only in the situation
+  described:
+  - **Icon set download** — when you first pick an icon from a set that is
+    not on disk (a BRAT install ships without them), the plugin downloads that
+    set from this repository's release for your version, once, and keeps it
+    next to `main.js`.
+  - **License standing check** — once a day, only after a license is
+    activated, the plugin asks SolidInvent's license endpoint whether the
+    license is still valid. It sends the license email encrypted to
+    SolidInvent's key and a proof derived from the key, never the key itself
+    and never vault content. This is how a refunded or leaked license is
+    revoked. If the endpoint cannot be reached, the plugin keeps working.
+- **Server-side telemetry.** The license endpoint records a SHA-256 hash of
+  the license email, the request's IP address and the time, to detect a
+  license shared beyond its owner. Nothing else is collected; there is no
+  client-side telemetry, analytics or advertising. Details:
+  [Privacy Policy](https://inventexplorer.solidinvent.pl/privacy).
+- **Files outside the vault.** None.
+
 ## Third-party icons
 
 The bundled icon sets are MIT and Apache-2.0 licensed; attribution ships in
