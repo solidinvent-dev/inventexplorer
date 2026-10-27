@@ -65,6 +65,12 @@ interface StoredConfigData extends Partial<PluginSettings> {
 	iconData?: IconData;
 }
 
+/** data.json as written by any version: every field optional, none trusted. */
+interface StoredPluginData extends Partial<PluginSettings> {
+	license?: { email?: unknown; key?: unknown; seed?: unknown };
+	iconData?: unknown;
+}
+
 interface DefaultIconEntry {
 	icon?: string;
 	color?: string;
@@ -205,13 +211,13 @@ function asRegexMasks(value: unknown): RegexMaskEntry[] {
 }
 
 function createIconPlacementDesc(): DocumentFragment {
-	const fragment = document.createDocumentFragment();
+	const fragment = createFragment();
 	fragment.append(
 		"Alongside: icon appears to the left of the name. " +
 		"Replace arrows: for folders the icon takes the place of the collapse arrow — clicking it still expands/collapses the folder.",
 	);
-	fragment.append(document.createElement("br"));
-	fragment.append(document.createElement("br"));
+	fragment.append(createEl("br"));
+	fragment.append(createEl("br"));
 	fragment.append(
 		"⚠️ Restart Obsidian after changing this setting to fully apply the new placement.",
 	);
@@ -374,7 +380,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		this.app.workspace.onLayoutReady(() => {
 			this.attachObservers();
 			this.applyReplaceArrowsClass();
-			this.preloadUsedIconSets().then(() => {
+			void this.preloadUsedIconSets().then(() => {
 				this.refresh();
 				this.settleFileExplorerLayout();
 				this.refreshInlineTitleIcons();
@@ -448,9 +454,9 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 	// ---------- Loading & saving ----------
 
 	async loadAll() {
-		const rawStored = await this.loadData();
+		const rawStored = (await this.loadData()) as StoredPluginData | null;
 		// null/undefined means no data.json yet — a genuine first run.
-		const stored = rawStored ?? {};
+		const stored: StoredPluginData = rawStored ?? {};
 		this.license = {
 			email: typeof stored.license?.email === "string" ? stored.license.email : undefined,
 			key: typeof stored.license?.key === "string" ? stored.license.key : undefined,
@@ -498,9 +504,9 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 	}
 
 	async loadIconData() {
-		const stored = (await this.loadData()) ?? {};
+		const stored = ((await this.loadData()) as StoredPluginData | null) ?? {};
 		if (this.settings.storageLocation === "plugin") {
-			this.iconData = stored.iconData ?? {};
+			this.iconData = asIconData(stored.iconData);
 			return;
 		}
 		const vaultConfig = await this.readVaultConfig(
@@ -509,7 +515,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		if (vaultConfig) {
 			this.applyVaultConfig(vaultConfig);
 		} else {
-			this.iconData = stored.iconData ?? {};
+			this.iconData = asIconData(stored.iconData);
 		}
 	}
 
@@ -524,10 +530,10 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		if (this.configReloadTimer !== null) {
 			window.clearTimeout(this.configReloadTimer);
 		}
-		this.configReloadTimer = window.setTimeout(async () => {
+		this.configReloadTimer = window.setTimeout(() => void (async () => {
 			this.configReloadTimer = null;
 			await this.reloadVaultConfigFromDisk();
-		}, 250);
+		})(), 250);
 	}
 
 	/**
@@ -694,20 +700,20 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 				}
 				if (!desiredKey) return;
 
-				const iconEl = document.createElement("span");
+				const iconEl = createSpan();
 				iconEl.className = "inventexplorer-inline-icon";
 				iconEl.contentEditable = "false";
 				iconEl.setAttribute("data-inventexplorer-key", desiredKey);
 
 				const result = renderIconToEl(
 					iconEl,
-					entry!.icon!,
+					entry.icon!,
 					this.iconSetCache,
-					entry!.color,
+					entry.color,
 				);
 				if (result === "missing-set") {
-					const setId = entry!.icon!.split(":")[0];
-					this.getIconSet(setId).then(() => this.refreshInlineTitleIcons());
+					const setId = entry.icon!.split(":")[0];
+					void this.getIconSet(setId).then(() => this.refreshInlineTitleIcons());
 					return;
 				}
 				titleEl.prepend(iconEl);
@@ -753,7 +759,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		if (!(await adapter.exists(normalizedPath))) return null;
 		try {
 			const text = await adapter.read(normalizedPath);
-			const parsed = JSON.parse(text);
+			const parsed = JSON.parse(text) as unknown;
 			this.lastKnownFileContent = text;
 			if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
 				this.showConfigNotice(
@@ -761,7 +767,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 				);
 				return null;
 			}
-			return parsed as StoredConfigData;
+			return parsed;
 		} catch (e) {
 			console.error("inventexplorer: failed to read config", e);
 			this.showConfigNotice(
@@ -888,9 +894,9 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		if (onDisk === this.lastKnownFileContent) return mine;
 		let incoming: StoredConfigData;
 		try {
-			const parsed = JSON.parse(onDisk);
+			const parsed = JSON.parse(onDisk) as unknown;
 			if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) return mine;
-			incoming = parsed as StoredConfigData;
+			incoming = parsed;
 		} catch {
 			// Half-written by a sync client: our own copy is the sane one.
 			return mine;
@@ -899,7 +905,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		// not undone by the copy that still has it.
 		let base: StoredConfigData | null = null;
 		try {
-			base = this.lastKnownFileContent ? JSON.parse(this.lastKnownFileContent) : null;
+			base = this.lastKnownFileContent ? (JSON.parse(this.lastKnownFileContent) as StoredConfigData) : null;
 		} catch { base = null; }
 		const { merged, report } = mergeWithBase(
 			base as never,
@@ -921,7 +927,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 					`merged (${describeMerge(report)}).`,
 			);
 		}
-		return merged as StoredConfigData;
+		return merged;
 	}
 
 	// ---------- External icon sets ----------
@@ -1080,13 +1086,13 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		}
 		const local = buildStoredConfigData(this.settings, this.iconData);
 		const { merged, report } = mergeStoredConfig(
-			local as never,
+			local,
 			incoming as never,
 			DEFAULT_SETTINGS as unknown as Record<string, unknown>,
 		);
 		this.settings.storageLocation = "vault";
 		this.settings.vaultConfigPath = normalizedPath;
-		this.applyVaultConfig(merged as StoredConfigData);
+		this.applyVaultConfig(merged);
 		this.applyAllSettings();
 		// The merged result is written back, so the file gains what only this
 		// device had — that is the half of the merge the other device sees.
@@ -1249,7 +1255,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 			);
 			const isFolder = !!collapseEl;
 			const isCollapsed = isFolder
-				? collapseEl!.classList.contains("is-collapsed")
+				? collapseEl.classList.contains("is-collapsed")
 				: false;
 
 			// Resolve each property independently through the priority chain:
@@ -1335,18 +1341,18 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 				continue;
 			}
 
-			const node = document.createElement("div");
+			const node = createDiv();
 			node.className = ICON_CLASS;
-			node.setAttr("aria-label", activeIcon!);
+			node.setAttr("aria-label", activeIcon);
 			const result = renderIconToEl(
 				node,
-				activeIcon!,
+				activeIcon,
 				this.iconSetCache,
 				activeColor,
 			);
 			if (result === "missing-set") {
-				const setId = activeIcon!.split(":")[0];
-				this.getIconSet(setId).then(() => this.scheduleRefresh());
+				const setId = activeIcon.split(":")[0];
+				void this.getIconSet(setId).then(() => this.scheduleRefresh());
 				target.removeAttribute(KEY_ATTR);
 				continue;
 			}
@@ -1450,7 +1456,7 @@ function mutationIsOurs(m: MutationRecord): boolean {
 		for (let i = 0; i < nodes.length; i++) {
 			const n = nodes[i] as HTMLElement;
 			if (
-				!(n instanceof HTMLElement) ||
+				!(n.instanceOf(HTMLElement)) ||
 				!n.classList?.contains(ICON_CLASS)
 			) {
 				return false;
@@ -1503,6 +1509,18 @@ function applyTextStyle(el: HTMLElement | null, ts: TextStyle | undefined) {
 	el.style.color = ts?.textColor ?? "";
 }
 
+/**
+ * Insert one of the bundled icon SVGs. Parsed as SVG rather than assigned as
+ * HTML, so nothing in the string is ever treated as markup or script; every
+ * bundled icon declares the SVG namespace this relies on.
+ */
+function appendSvg(el: HTMLElement, svg: string): void {
+	const node = new DOMParser().parseFromString(svg, "image/svg+xml").documentElement;
+	if (node.namespaceURI !== "http://www.w3.org/2000/svg" || node.localName !== "svg") return;
+	node.classList.add("inventexplorer-svg");
+	el.appendChild(node);
+}
+
 function renderIconToEl(
 	el: HTMLElement,
 	iconId: string,
@@ -1522,9 +1540,7 @@ function renderIconToEl(
 		if (!setData) return "missing-set";
 		const svg = setData[iconName];
 		if (svg) {
-			el.innerHTML = svg; // safe: our own generated SVG from known icon libraries
-			const svgEl = el.querySelector("svg");
-			if (svgEl) (svgEl as unknown as HTMLElement).style.display = "block";
+			appendSvg(el, svg);
 		}
 		if (color) el.style.color = color;
 		return "ok";
@@ -1538,7 +1554,7 @@ function renderIconToEl(
 // ---------- Color helpers ----------
 
 function isValidCssColor(color: string): boolean {
-	const el = document.createElement("span");
+	const el = createSpan();
 	el.style.color = color;
 	return el.style.color !== "";
 }
@@ -1550,7 +1566,7 @@ function cssColorToHex(color: string): string | null {
 	if (/^#[0-9a-fA-F]{6}$/.test(color)) return color;
 	// Use canvas to let the browser normalise to hex
 	try {
-		const canvas = document.createElement("canvas");
+		const canvas = createEl("canvas");
 		canvas.width = canvas.height = 1;
 		const ctx = canvas.getContext("2d");
 		if (!ctx) return null;
@@ -1646,18 +1662,18 @@ class CustomizeIconModal extends Modal {
 
 		const buttons = contentEl.createDiv({ cls: "inventexplorer-buttons" });
 		const applyBtn = buttons.createEl("button", { text: "Apply" });
-		applyBtn.addEventListener("click", async () => {
+		applyBtn.addEventListener("click", () => void (async () => {
 			await this.applyChanges();
 			new Notice("InventExplorer: changes applied");
-		});
+		})());
 		const saveBtn = buttons.createEl("button", {
 			text: "Save",
 			cls: "mod-cta",
 		});
-		saveBtn.addEventListener("click", async () => {
+		saveBtn.addEventListener("click", () => void (async () => {
 			await this.applyChanges();
 			this.close();
-		});
+		})());
 		const cancelBtn = buttons.createEl("button", { text: "Cancel" });
 		cancelBtn.addEventListener("click", () => this.close());
 	}
@@ -1759,7 +1775,7 @@ class CustomizeIconModal extends Modal {
 				colorSetting
 					.addColorPicker((c) => {
 						c.setValue(cssColorToHex(getColor() ?? "") ?? "#888888");
-						pickerSetValue = (hex) => c.setValue(hex);
+						pickerSetValue = (hex) => { c.setValue(hex); };
 						c.onChange((hex) => {
 							setColor(hex);
 							textSetValue(hex);
@@ -1815,7 +1831,7 @@ class CustomizeIconModal extends Modal {
 				if (result === "missing-set") {
 					iconEl.setText("…");
 					const setId = iconId.split(":")[0];
-					this.plugin.getIconSet(setId).then(() => this.renderPreview(el));
+					void this.plugin.getIconSet(setId).then(() => this.renderPreview(el));
 				}
 			} else {
 				iconEl.setText("·");
@@ -2115,7 +2131,7 @@ class IconPickerModal extends Modal {
 
 		// ── Lucide IDs ────────────────────────────────────────────
 		try {
-			this.allLucideIds = (typeof getIconIds === "function" ? getIconIds() : []) as string[];
+			this.allLucideIds = (typeof getIconIds === "function" ? getIconIds() : []);
 			this.allLucideIds.sort();
 		} catch {
 			this.allLucideIds = [];
@@ -2179,7 +2195,7 @@ class IconPickerModal extends Modal {
 		this.extMissing = false;
 		this.renderGrid(); // shows spinner
 
-		this.plugin.getIconSet(setId).then((data) => {
+		void this.plugin.getIconSet(setId).then((data) => {
 			if (!this.isOpen) return; // modal closed while loading
 			this.extLoading = false;
 			if (data) {
@@ -2272,9 +2288,7 @@ class IconPickerModal extends Modal {
 			const key = `${this.activeIconSet}:${name}`;
 			const cell = this.makeCell(name, key === this.currentIcon);
 			const inner = cell.createDiv({ cls: "inventexplorer-cell-inner" });
-			inner.innerHTML = svg; // safe: our own generated SVG
-			const svgEl = inner.querySelector("svg");
-			if (svgEl) (svgEl as unknown as HTMLElement).style.display = "block";
+			appendSvg(inner, svg);
 			cell.createDiv({ cls: "inventexplorer-cell-name", text: name });
 			if (locked) cell.addClass("inventexplorer-cell-pro");
 			cell.addEventListener("click", () => {
@@ -2398,7 +2412,7 @@ function renderSharedIconColorBlock(
 			colorSetting
 				.addColorPicker((c) => {
 					c.setValue(cssColorToHex(getColor() ?? "") ?? "#888888");
-					pickerSetValue = (hex) => c.setValue(hex);
+					pickerSetValue = (hex) => { c.setValue(hex); };
 					c.onChange((hex) => {
 						setColorFn(hex);
 						textSetValue(hex);
@@ -2556,7 +2570,7 @@ function renderSharedTextStyleBlock(
 		.setName("Text color")
 		.addColorPicker((c) => {
 			c.setValue(cssColorToHex(get().textColor ?? "") ?? "#888888");
-			tcPickerSet = (hex) => c.setValue(hex);
+			tcPickerSet = (hex) => { c.setValue(hex); };
 			c.onChange((hex) => {
 				update({ textColor: hex });
 				tcTextSet(hex);
@@ -2728,15 +2742,15 @@ class RegexMaskEditModal extends Modal {
 		contentEl.createEl("hr", { cls: "inventexplorer-section-sep" });
 		const buttons = contentEl.createDiv({ cls: "inventexplorer-buttons" });
 		const applyBtn = buttons.createEl("button", { text: "Apply" });
-		applyBtn.addEventListener("click", async () => {
+		applyBtn.addEventListener("click", () => void (async () => {
 			if (await this.applyChanges()) {
 				new Notice("InventExplorer: changes applied");
 			}
-		});
+		})());
 		const saveBtn = buttons.createEl("button", { text: "Save", cls: "mod-cta" });
-		saveBtn.addEventListener("click", async () => {
+		saveBtn.addEventListener("click", () => void (async () => {
 			if (await this.applyChanges()) this.close();
-		});
+		})());
 		const cancelBtn = buttons.createEl("button", { text: "Cancel" });
 		cancelBtn.addEventListener("click", () => this.close());
 	}
@@ -2926,15 +2940,15 @@ class DefaultIconsAndMasksModal extends Modal {
 		contentEl.createEl("hr", { cls: "inventexplorer-section-sep" });
 		const buttons = contentEl.createDiv({ cls: "inventexplorer-buttons" });
 		const applyBtn = buttons.createEl("button", { text: "Apply" });
-		applyBtn.addEventListener("click", async () => {
+		applyBtn.addEventListener("click", () => void (async () => {
 			await this.applyChanges();
 			new Notice("InventExplorer: changes applied");
-		});
+		})());
 		const saveBtn = buttons.createEl("button", { text: "Save", cls: "mod-cta" });
-		saveBtn.addEventListener("click", async () => {
+		saveBtn.addEventListener("click", () => void (async () => {
 			await this.applyChanges();
 			this.close();
-		});
+		})());
 		const cancelBtn = buttons.createEl("button", { text: "Cancel" });
 		cancelBtn.addEventListener("click", () => this.close());
 	}
@@ -2979,21 +2993,21 @@ class DefaultIconsAndMasksModal extends Modal {
 			if (i > 0) {
 				const upBtn = actions.createEl("button", { text: "↑", cls: "inventexplorer-mask-move" });
 				upBtn.setAttr("aria-label", "Move up");
-				upBtn.addEventListener("click", async () => {
+				upBtn.addEventListener("click", () => void (async () => {
 					[this.masks[i - 1], this.masks[i]] = [this.masks[i], this.masks[i - 1]];
 					await this.applyChanges();
 					this.render();
-				});
+				})());
 			}
 
 			if (i < this.masks.length - 1) {
 				const downBtn = actions.createEl("button", { text: "↓", cls: "inventexplorer-mask-move" });
 				downBtn.setAttr("aria-label", "Move down");
-				downBtn.addEventListener("click", async () => {
+				downBtn.addEventListener("click", () => void (async () => {
 					[this.masks[i], this.masks[i + 1]] = [this.masks[i + 1], this.masks[i]];
 					await this.applyChanges();
 					this.render();
-				});
+				})());
 			}
 
 			const editBtn = actions.createEl("button", { text: "Edit" });
@@ -3014,11 +3028,11 @@ class DefaultIconsAndMasksModal extends Modal {
 				text: "Delete",
 				cls: "mod-warning",
 			});
-			deleteBtn.addEventListener("click", async () => {
+			deleteBtn.addEventListener("click", () => void (async () => {
 				this.masks.splice(i, 1);
 				await this.applyChanges();
 				this.render();
-			});
+			})());
 		}
 	}
 
@@ -3038,7 +3052,7 @@ class DefaultIconsAndMasksModal extends Modal {
 			if (result === "missing-set") {
 				iconEl.setText("…");
 				const setId = entry.icon.split(":")[0];
-				this.plugin.getIconSet(setId).then(() => this.render());
+				void this.plugin.getIconSet(setId).then(() => this.render());
 			}
 		} else {
 			iconEl.setText("·");
@@ -3155,7 +3169,7 @@ class VaultConfigSuggestModal extends SuggestModal<TFile> {
 	}
 
 	renderSuggestion(file: TFile, el: HTMLElement) {
-		el.createEl("div", { text: file.path });
+		el.createDiv({ text: file.path });
 	}
 
 	onChooseSuggestion(file: TFile) {
@@ -3228,8 +3242,6 @@ class InventExplorerSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "InventExplorer" });
-
 		this.renderSyncBanner(containerEl);
 		this.renderActivation(containerEl);
 
@@ -3254,7 +3266,7 @@ class InventExplorerSettingTab extends PluginSettingTab {
 					.addOption("vault", "Inside vault (with notes)")
 					.addOption(
 						"plugin",
-						"Plugin folder (.obsidian/plugins/inventexplorer/data.json)",
+						`Plugin folder (${this.app.vault.configDir}/plugins/inventexplorer/data.json)`,
 					)
 					.setValue(this.plugin.settings.storageLocation)
 					.onChange(async (v) => {
@@ -3459,7 +3471,7 @@ class InventExplorerSettingTab extends PluginSettingTab {
 	 * website and every in-app notice point at.
 	 */
 	private renderActivation(containerEl: HTMLElement) {
-		containerEl.createEl("h3", { text: "Activation" });
+		new Setting(containerEl).setName("Activation").setHeading();
 
 		if (isLicensed()) {
 			new Setting(containerEl)
@@ -3627,7 +3639,7 @@ class InventExplorerSettingTab extends PluginSettingTab {
 				c.setValue(
 					cssColorToHex(this.plugin.settings.explorerBgColor) ?? "#1e1e1e",
 				);
-				bgPickerSet = (hex) => c.setValue(hex);
+				bgPickerSet = (hex) => { c.setValue(hex); };
 				c.onChange((hex) => {
 					this.plugin.settings.explorerBgColor = hex;
 					this.plugin.applyExplorerBgColor();
@@ -3682,7 +3694,7 @@ class InventExplorerSettingTab extends PluginSettingTab {
 			.setDesc("Color of the horizontal separator lines. Leave empty for the default gray.")
 			.addColorPicker((c) => {
 				c.setValue(cssColorToHex(this.plugin.settings.indentLinesColor) ?? "#808080");
-				indentColorPickerSet = (hex) => c.setValue(hex);
+				indentColorPickerSet = (hex) => { c.setValue(hex); };
 				c.onChange((hex) => {
 					this.plugin.settings.indentLinesColor = hex;
 					this.plugin.applyIndentLinesStyle();
@@ -3697,8 +3709,8 @@ class InventExplorerSettingTab extends PluginSettingTab {
 				indentColorTextSet = (v) => { t.inputEl.value = v; };
 				t.onChange((v) => {
 					const trimmed = v.trim();
-					if (!trimmed || trimmed.toLowerCase() === "default") { applyIndentColor(""); return; }
-					if (isValidCssColor(trimmed)) applyIndentColor(trimmed);
+					if (!trimmed || trimmed.toLowerCase() === "default") { void applyIndentColor(""); return; }
+					if (isValidCssColor(trimmed)) void applyIndentColor(trimmed);
 				});
 			})
 			.addButton((b) => b.setButtonText("Clear").onClick(() => applyIndentColor("")));
@@ -3749,7 +3761,7 @@ class InventExplorerSettingTab extends PluginSettingTab {
 			.setDesc("Color of the vertical indent lines. Leave empty to inherit the theme color.")
 			.addColorPicker((c) => {
 				c.setValue(cssColorToHex(this.plugin.settings.verticalLinesColor) ?? "#808080");
-				vertColorPickerSet = (hex) => c.setValue(hex);
+				vertColorPickerSet = (hex) => { c.setValue(hex); };
 				c.onChange((hex) => {
 					this.plugin.settings.verticalLinesColor = hex;
 					this.plugin.applyVerticalLinesStyle();
@@ -3764,8 +3776,8 @@ class InventExplorerSettingTab extends PluginSettingTab {
 				vertColorTextSet = (v) => { t.inputEl.value = v; };
 				t.onChange((v) => {
 					const trimmed = v.trim();
-					if (!trimmed || trimmed.toLowerCase() === "default") { applyVertColor(""); return; }
-					if (isValidCssColor(trimmed)) applyVertColor(trimmed);
+					if (!trimmed || trimmed.toLowerCase() === "default") { void applyVertColor(""); return; }
+					if (isValidCssColor(trimmed)) void applyVertColor(trimmed);
 				});
 			})
 			.addButton((b) => b.setButtonText("Clear").onClick(() => applyVertColor("")));

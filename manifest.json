@@ -1,7 +1,7 @@
 {
   "id": "inventexplorer",
   "name": "InventExplorer",
-  "version": "1.1.6",
+  "version": "1.1.7",
   "minAppVersion": "1.5.0",
   "description": "Add custom icons and colors next to file and folder names in the file explorer.",
   "author": "InventExplorer",

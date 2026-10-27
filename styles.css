@@ -21,6 +21,10 @@
 	line-height: 1;
 }
 
+.inventexplorer-svg {
+	display: block;
+}
+
 .inventexplorer-icon svg {
 	width: var(--inventexplorer-size, 16px);
 	height: var(--inventexplorer-size, 16px);
@@ -154,6 +158,7 @@
 .inventexplorer-cell-inner svg {
 	width: 18px;
 	height: 18px;
+	display: block;
 }
 
 .inventexplorer-cell-name {

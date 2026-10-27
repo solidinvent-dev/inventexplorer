@@ -74,7 +74,7 @@ export function parseStamp(
 	verify: (p: string, s: string) => boolean = verifyVendorSignature,
 ): Stamp | null {
 	try {
-		const obj = typeof raw === "string" ? JSON.parse(atob(raw)) : raw;
+		const obj = (typeof raw === "string" ? JSON.parse(atob(raw)) : raw) as { p?: unknown; s?: unknown } | null;
 		if (!obj || typeof obj.p !== "string" || typeof obj.s !== "string") return null;
 		const m2 = STAMP_V2_RE.exec(obj.p);
 		const m1 = m2 ? null : STAMP_V1_RE.exec(obj.p);
