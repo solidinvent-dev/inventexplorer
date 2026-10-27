@@ -85,7 +85,8 @@ Prices are on the website.
     license is still valid. It sends the license email encrypted to
     SolidInvent's key and a proof derived from the key, never the key itself
     and never vault content. This is how a refunded or leaked license is
-    revoked. If the endpoint cannot be reached, the plugin keeps working.
+    revoked. Being offline never suspends a license: when you are back
+    online, one check runs, however long you were away.
 - **Server-side telemetry.** The license endpoint records a SHA-256 hash of
   the license email, the request's IP address and the time, to detect a
   license shared beyond its owner. Nothing else is collected; there is no
