@@ -1,0 +1,22 @@
+{
+  "name": "inventexplorer",
+  "version": "1.1.6",
+  "description": "Add custom icons and colors next to file and folder names in the file explorer.",
+  "private": true,
+  "license": "SEE LICENSE IN LICENSE",
+  "scripts": {
+    "dev": "node esbuild.config.mjs",
+    "build": "node esbuild.config.mjs production"
+  },
+  "dependencies": {
+    "@noble/curves": "^1.9.7"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "builtin-modules": "^3.3.0",
+    "esbuild": "^0.20.0",
+    "obsidian": "^1.5.7",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.0"
+  }
+}

@@ -6,10 +6,13 @@ icons from Lucide, Tabler, Boxicons and Phosphor, plus every emoji.
 
 **Website and documentation: https://inventexplorer.solidinvent.pl**
 
-This repository exists to distribute the plugin. **InventExplorer is not open
-source** — the source lives in a private repository, and only the built plugin
-is published here, under the [EULA](LICENSE). The same files are also available
-directly from the website.
+This repository holds the plugin's source code and its releases. **InventExplorer
+is source-available, not open source**: you can read the code, audit what it
+does and build it for your own use, under the [EULA](LICENSE). Each release
+adds one commit with the source it was built from. The same plugin files are
+also available directly from the website.
+
+Building from source: `npm ci && npm run build` produces `main.js`.
 
 ## Install
 

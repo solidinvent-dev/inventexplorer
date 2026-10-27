@@ -1,0 +1,646 @@
+/* Obsidian's .tree-item-self is `display: flex; align-items: baseline`.
+ * That baseline alignment looks fine when the icon is ~16px (its bottom
+ * roughly meets the text baseline), but at larger sizes it makes the icon
+ * appear too high relative to the text. When OUR icon is present we switch
+ * the row to `align-items: center` so icon and text track each other no
+ * matter the icon size. Folders' native collapse arrow is position:absolute
+ * so it isn't a flex child and is unaffected. */
+.tree-item-self:has(.inventexplorer-icon) {
+	align-items: center;
+}
+
+.inventexplorer-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--inventexplorer-size, 16px);
+	height: var(--inventexplorer-size, 16px);
+	margin-right: calc(var(--inventexplorer-size, 16px) * 0.25);
+	flex-shrink: 0;
+	align-self: center;
+	line-height: 1;
+}
+
+.inventexplorer-icon svg {
+	width: var(--inventexplorer-size, 16px);
+	height: var(--inventexplorer-size, 16px);
+	display: block;
+}
+
+/* Customize modal */
+.inventexplorer-modal .inventexplorer-title {
+	margin-top: 0;
+	word-break: break-all;
+}
+
+.inventexplorer-preview {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 8px 12px;
+	margin-bottom: 12px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	font-size: var(--font-ui-medium);
+}
+
+.inventexplorer-preview-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+}
+
+.inventexplorer-preview-icon svg {
+	width: 16px;
+	height: 16px;
+}
+
+.inventexplorer-preview-kind {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+.inventexplorer-palette {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	margin: 8px 0 16px;
+}
+
+.inventexplorer-swatch {
+	width: 22px;
+	height: 22px;
+	border-radius: 50%;
+	cursor: pointer;
+	border: 2px solid var(--background-modifier-border);
+	transition: transform 0.1s;
+}
+
+.inventexplorer-swatch:hover {
+	transform: scale(1.1);
+}
+
+.inventexplorer-swatch.is-active {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 2px;
+}
+
+.inventexplorer-color-text {
+	width: 160px;
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+}
+
+.inventexplorer-buttons {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 12px;
+}
+
+/* Icon picker */
+.inventexplorer-picker .inventexplorer-search {
+	width: 100%;
+	margin-bottom: 8px;
+	padding: 6px 8px;
+}
+
+.inventexplorer-status {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	margin-bottom: 8px;
+}
+
+.inventexplorer-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+	gap: 4px;
+	max-height: 50vh;
+	overflow-y: auto;
+	padding: 4px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+}
+
+.inventexplorer-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 8px 4px;
+	border-radius: 4px;
+	cursor: pointer;
+	user-select: none;
+	gap: 4px;
+}
+
+.inventexplorer-cell:hover {
+	background: var(--background-modifier-hover);
+}
+
+.inventexplorer-cell.is-selected {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.inventexplorer-cell-inner {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.inventexplorer-cell-inner svg {
+	width: 18px;
+	height: 18px;
+}
+
+.inventexplorer-cell-name {
+	font-size: 9px;
+	line-height: 1.1;
+	text-align: center;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 100%;
+	color: var(--text-muted);
+	word-break: break-all;
+}
+
+.inventexplorer-cell.is-selected .inventexplorer-cell-name {
+	color: var(--text-on-accent);
+}
+
+.inventexplorer-empty {
+	padding: 24px;
+	text-align: center;
+	color: var(--text-muted);
+	grid-column: 1 / -1;
+}
+
+/* Tab bar */
+.inventexplorer-tabbar {
+	display: flex;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.inventexplorer-tab {
+	flex: 1;
+	padding: 4px 8px;
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	cursor: pointer;
+	font-size: var(--font-ui-small);
+}
+
+.inventexplorer-tab.is-active {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+/* Category row (emoji) */
+.inventexplorer-catrow {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	margin-bottom: 8px;
+}
+
+.inventexplorer-catbtn {
+	padding: 2px 8px;
+	border-radius: 12px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	cursor: pointer;
+	font-size: var(--font-ui-smaller);
+	white-space: nowrap;
+}
+
+.inventexplorer-catbtn:hover {
+	background: var(--background-modifier-hover);
+}
+
+/* Emoji cells — larger because glyphs are inherently readable */
+.inventexplorer-emoji-cell {
+	min-width: 48px;
+}
+
+/* Wrapper div: flex so it can center the block-level glyph span */
+.inventexplorer-is-emoji {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* The glyph itself: block eliminates inline-baseline quirks,
+   letting the flex parent do clean vertical centering */
+.inventexplorer-emoji-glyph {
+	display: block;
+	line-height: 1;
+	font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+}
+
+/* Size in file explorer */
+.inventexplorer-icon.inventexplorer-is-emoji .inventexplorer-emoji-glyph {
+	font-size: calc(var(--inventexplorer-size, 16px) * 0.875);
+}
+
+/* Size in picker grid */
+.inventexplorer-cell-inner.inventexplorer-is-emoji .inventexplorer-emoji-glyph {
+	font-size: 20px;
+}
+
+/* Size in preview */
+.inventexplorer-preview-icon.inventexplorer-is-emoji .inventexplorer-emoji-glyph {
+	font-size: 18px;
+}
+
+/* Info text in customize modal */
+.inventexplorer-info {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	margin: 4px 0 12px;
+}
+
+/* Section separator between collapsed and expanded blocks */
+.inventexplorer-section-sep {
+	border: none;
+	border-top: 1px solid var(--background-modifier-border);
+	margin: 12px 0;
+}
+
+/* Slot wrapper in the two-icon preview (collapsed ▶ / expanded ▼) */
+.inventexplorer-preview-slot {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	margin-right: 6px;
+}
+
+/* ── Replace-arrows mode ───────────────────────────────────────────────────
+ * Our icon is prepended INSIDE .tree-item-icon.collapse-icon so it sits at
+ * the exact arrow position.  We hide only the native SVG arrow (sibling of
+ * our node inside that container), and undo Obsidian's rotation transform
+ * so the icon stays upright when the folder is toggled. */
+
+/* Hide the original SVG arrow that follows our icon inside the container */
+.inventexplorer-replaces-arrow ~ svg {
+	display: none !important;
+}
+
+/* Prevent Obsidian's collapse animation from rotating our icon's SVG,
+   restore the correct size, and undo any stroke-width override from the theme. */
+.tree-item-icon.collapse-icon .inventexplorer-replaces-arrow svg {
+	width: var(--inventexplorer-size, 16px) !important;
+	height: var(--inventexplorer-size, 16px) !important;
+	stroke-width: 2 !important;
+	transform: none !important;
+	transition: none !important;
+}
+
+/* Remove the right margin — no label follows inside the arrow container */
+.tree-item-icon.collapse-icon .inventexplorer-icon.inventexplorer-replaces-arrow {
+	margin-right: 0;
+}
+
+/* ── Replace-arrows file alignment ────────────────────────────────────────
+ * In normal mode .nav-file-title has padding-left 24px (--size-4-6) which
+ * aligns the file name with folder names.  In replace-arrows mode the
+ * folder icon sits at 4px (absolute, --size-4-6 minus --size-4-5 = 4px)
+ * and the large custom icon creates a strong visual anchor there, making
+ * files at 24px appear to be indented *inside* the folder rather than
+ * beside it.  Reducing the padding to 4px aligns each file's left edge
+ * with the left edge of same-level folder icons. */
+.inventexplorer-replace-arrows .nav-file-title {
+	padding-inline-start: 4px;
+}
+
+/* ── Replace-arrows folder text clearance ─────────────────────────────────
+ * .collapse-icon is position:absolute and its static position is anchored
+ * to .tree-item-self's padding-inline-start. Changing that padding shifts
+ * the icon AND the text by the same amount, so the gap stays at
+ *   gap = 12 − iconSize/2     (becomes negative for iconSize > 24)
+ * Instead we leave .tree-item-self's padding alone (so the icon stays
+ * centered at column 12 and only overflows symmetrically left/right) and
+ * push only the text element (.tree-item-inner). The text needs to clear
+ * the icon's right edge (12 + iconSize/2) by gap = iconSize/4, so the
+ * extra padding needed is:
+ *   extra = (12 + iconSize*0.75) − 24 = iconSize*0.75 − 12
+ * Clamped at 0 so small icons don't pull text left of default. */
+.inventexplorer-replace-arrows .nav-folder-title > .tree-item-inner {
+	padding-inline-start: max(0px, calc(var(--inventexplorer-size, 16px) * 0.75 - 12px));
+}
+
+/* Active set button */
+.inventexplorer-setrow .inventexplorer-catbtn.is-active {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+/* Loading spinner */
+.inventexplorer-loading-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	padding: 40px;
+	grid-column: 1 / -1;
+}
+
+.inventexplorer-loading-text {
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+}
+
+@keyframes inventexplorer-spin {
+	to { transform: rotate(360deg); }
+}
+
+.inventexplorer-spinner {
+	width: 24px;
+	height: 24px;
+	border: 3px solid var(--background-modifier-border);
+	border-top-color: var(--interactive-accent);
+	border-radius: 50%;
+	animation: inventexplorer-spin 0.7s linear infinite;
+}
+
+/* ── Inline-title icon ─────────────────────────────────────────────────────
+ * Injected as a <span contenteditable="false"> at the start of .inline-title.
+ * vertical-align: middle aligns it with the adjacent text baseline. */
+.inventexplorer-inline-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: var(--inventexplorer-inline-size, 28px);
+	height: var(--inventexplorer-inline-size, 28px);
+	vertical-align: middle;
+	margin-right: calc(var(--inventexplorer-inline-size, 28px) * 0.2);
+	flex-shrink: 0;
+	line-height: 1;
+	pointer-events: none;
+}
+
+.inventexplorer-inline-icon svg {
+	width: var(--inventexplorer-inline-size, 28px);
+	height: var(--inventexplorer-inline-size, 28px);
+	display: block;
+}
+
+.inventexplorer-inline-icon.inventexplorer-is-emoji .inventexplorer-emoji-glyph {
+	font-size: var(--inventexplorer-inline-size, 28px);
+	display: block;
+	line-height: 1;
+}
+
+/* ── File explorer background ──────────────────────────────────────────────
+ * Applied via --inventexplorer-explorer-bg set on :root when a color is configured.
+ * Targets the scrollable content area of the file explorer. */
+.nav-files-container {
+	background-color: var(--inventexplorer-explorer-bg, transparent);
+}
+
+/* ── Indent guide lines ────────────────────────────────────────────────────
+ * Toggled by adding .inventexplorer-indent-lines to <body>.
+ * Color and thickness controlled via --inventexplorer-indent-color / --inventexplorer-indent-thickness. */
+.inventexplorer-indent-lines .nav-file-title,
+.inventexplorer-indent-lines .nav-folder-title {
+	border-bottom: var(--inventexplorer-indent-thickness, 1px) solid var(--inventexplorer-indent-color, rgba(128, 128, 128, 0.15));
+}
+
+/* ── Vertical indent guide lines ───────────────────────────────────────────
+ * Controlled by .inventexplorer-hide-vertical-lines on <body>.
+ * Color and thickness override via --inventexplorer-vertical-color / --inventexplorer-vertical-thickness.
+ * Obsidian draws vertical guides as border-left on .nav-folder-children. */
+body:not(.inventexplorer-hide-vertical-lines) .nav-folder-children {
+	border-left-color: var(--inventexplorer-vertical-color, var(--background-modifier-border));
+	border-left-width: var(--inventexplorer-vertical-thickness, 1px);
+	border-left-style: solid;
+}
+
+.inventexplorer-hide-vertical-lines .nav-folder-children {
+	border-left: none !important;
+}
+
+/* ── Default icons & regex masks modal ─────────────────────────────────────*/
+
+.inventexplorer-add-mask-btn {
+	margin-top: 8px;
+}
+
+/* Text style inputs */
+.inventexplorer-text-wide {
+	width: 220px;
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+}
+
+.inventexplorer-text-narrow {
+	width: 100px;
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+}
+
+/* Mask list */
+.inventexplorer-masks-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin-bottom: 8px;
+}
+
+.inventexplorer-mask-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 10px;
+	background: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.inventexplorer-mask-info {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.inventexplorer-mask-name {
+	font-size: var(--font-ui-small);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.inventexplorer-mask-pattern {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	font-family: var(--font-monospace);
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.inventexplorer-mask-previews {
+	display: flex;
+	gap: 12px;
+	flex-shrink: 0;
+}
+
+.inventexplorer-mini-preview {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.inventexplorer-mini-label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+}
+
+.inventexplorer-mask-actions {
+	display: flex;
+	gap: 4px;
+	flex-shrink: 0;
+}
+
+.inventexplorer-mask-move {
+	padding: 2px 6px;
+	font-size: var(--font-ui-smaller);
+}
+
+.inventexplorer-mask-error {
+	color: var(--text-error, #e05252);
+	font-size: var(--font-ui-smaller);
+	margin: 4px 0 8px;
+}
+
+/* ---------- Tier markers ---------- */
+/* Small chip appended to the label of a control that belongs to Pro. Muted on
+   purpose: it marks what a feature is, it does not shout for a sale. */
+.inventexplorer-pro-chip {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 0 5px;
+	border-radius: 4px;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: 9px;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	line-height: 15px;
+	vertical-align: middle;
+}
+
+/* Icon-set tab for a bundled (Pro) set — browsing stays open, so the tab is
+   only dimmed, never disabled. */
+.inventexplorer-catbtn-pro {
+	opacity: 0.72;
+}
+
+/* Grid cell in a Pro icon set: still fully rendered (seeing the icons is the
+   point), but the cursor tells you the click will not apply it. */
+.inventexplorer-cell-pro {
+	cursor: help;
+}
+
+.inventexplorer-cell-pro:hover {
+	outline: 1px dashed var(--background-modifier-border);
+}
+
+.inventexplorer-hold {
+	color: var(--text-error, #e05252);
+}
+
+/* ── InventTasks sync banner ───────────────────────────────────────────────
+ * Top of the settings tab: one card about syncing, the one thing this plugin
+ * deliberately does not do itself. Colour comes from the accent variable and a
+ * tint of the mark's own red, so it stands out in both themes without fighting
+ * whatever theme the user runs. Sized to three lines — visible, not a page. */
+.inventexplorer-promo {
+	display: flex;
+	gap: 12px;
+	align-items: flex-start;
+	margin: 0 0 18px;
+	padding: 12px 14px;
+	border: 1px solid var(--background-modifier-border);
+	border-left: 3px solid var(--interactive-accent);
+	border-radius: 8px;
+	background:
+		linear-gradient(
+			100deg,
+			color-mix(in srgb, var(--interactive-accent) 10%, transparent) 0%,
+			color-mix(in srgb, #e5484d 7%, transparent) 55%,
+			transparent 100%
+		),
+		var(--background-secondary);
+}
+
+.inventexplorer-promo-logo {
+	flex-shrink: 0;
+	margin-top: 1px;
+	width: 30px;
+	height: 30px;
+}
+
+.inventexplorer-promo-body {
+	min-width: 0;
+}
+
+.inventexplorer-promo-title {
+	font-weight: 600;
+	font-size: var(--font-ui-medium);
+	line-height: 1.3;
+	color: var(--text-normal);
+}
+
+.inventexplorer-promo-text {
+	margin-top: 2px;
+	font-size: var(--font-ui-smaller);
+	line-height: 1.45;
+	color: var(--text-muted);
+}
+
+.inventexplorer-promo-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	margin-top: 8px;
+	font-size: var(--font-ui-smaller);
+}
+
+.inventexplorer-promo-cta,
+.inventexplorer-promo-link {
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.inventexplorer-promo-cta {
+	font-weight: 600;
+	color: var(--interactive-accent);
+}
+
+.inventexplorer-promo-link {
+	color: var(--text-muted);
+}
+
+.inventexplorer-promo-cta:hover,
+.inventexplorer-promo-link:hover {
+	text-decoration: underline;
+}
+
+/* Narrow screens: the mark and the text stop competing for the same row. */
+@media (max-width: 400px) {
+	.inventexplorer-promo {
+		flex-direction: column;
+		gap: 8px;
+	}
+}
