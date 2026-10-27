@@ -150,6 +150,8 @@ const INVENTTASKS_LOGO_DARK =
 	"data:image/png;base64,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";
 
 const ICON_CLASS = "inventexplorer-icon";
+/** Set on an explorer row that carries our icon (in place of a :has() rule). */
+const ROW_CLASS = "inventexplorer-has-icon";
 const KEY_ATTR = "data-inventexplorer-key";
 
 /**
@@ -796,6 +798,17 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 		await this.persist();
 	}
 
+	/** LicenseHost: this device's copy, scoped to the vault by Obsidian. */
+	loadLocal(key: string): string | null {
+		const value: unknown = this.app.loadLocalStorage(key);
+		return typeof value === "string" ? value : null;
+	}
+
+	/** LicenseHost: see loadLocal. */
+	saveLocal(key: string, value: string): void {
+		this.app.saveLocalStorage(key, value);
+	}
+
 	/** LicenseHost: re-render everything after a tier change. */
 	refreshAll(): void {
 		this.applyAllSettings();
@@ -1330,6 +1343,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 
 			// Remove any previous icon decoration
 			target.querySelectorAll(`.${ICON_CLASS}`).forEach((el) => el.remove());
+			target.removeClass(ROW_CLASS);
 
 			// Apply / remove text style on the inner text element
 			const innerEl = target.querySelector<HTMLElement>(".tree-item-inner");
@@ -1357,6 +1371,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 				continue;
 			}
 
+			target.addClass(ROW_CLASS);
 			if (this.settings.replaceArrows && collapseEl) {
 				// Place icon INSIDE the collapse indicator so it occupies
 				// the exact same space as the arrow.
@@ -1395,6 +1410,7 @@ export default class InventExplorerPlugin extends Plugin implements LicenseHost 
 				.querySelectorAll<HTMLElement>(`[${KEY_ATTR}]`)
 				.forEach((el) => {
 					el.removeAttribute(KEY_ATTR);
+					el.removeClass(ROW_CLASS);
 					const inner = el.querySelector<HTMLElement>(".tree-item-inner");
 					applyTextStyle(inner, undefined);
 				});
@@ -3379,7 +3395,6 @@ class InventExplorerSettingTab extends PluginSettingTab {
 				s
 					.setLimits(10, 28, 1)
 					.setValue(this.plugin.settings.iconSize)
-					.setDynamicTooltip()
 					.onChange((v) => {
 						this.plugin.settings.iconSize = v;
 						this.plugin.applyIconSize();
@@ -3394,7 +3409,6 @@ class InventExplorerSettingTab extends PluginSettingTab {
 				s
 					.setLimits(16, 48, 2)
 					.setValue(this.plugin.settings.inlineTitleIconSize)
-					.setDynamicTooltip()
 					.onChange((v) => {
 						this.plugin.settings.inlineTitleIconSize = v;
 						this.plugin.applyInlineTitleIconSize();
@@ -3723,7 +3737,6 @@ class InventExplorerSettingTab extends PluginSettingTab {
 			.addSlider((s) =>
 				s.setLimits(1, 5, 1)
 					.setValue(this.plugin.settings.indentLinesThickness)
-					.setDynamicTooltip()
 					.onChange((v) => {
 						this.plugin.settings.indentLinesThickness = v;
 						this.plugin.applyIndentLinesStyle();
@@ -3790,7 +3803,6 @@ class InventExplorerSettingTab extends PluginSettingTab {
 			.addSlider((s) =>
 				s.setLimits(1, 5, 1)
 					.setValue(this.plugin.settings.verticalLinesThickness)
-					.setDynamicTooltip()
 					.onChange((v) => {
 						this.plugin.settings.verticalLinesThickness = v;
 						this.plugin.applyVerticalLinesStyle();

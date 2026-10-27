@@ -4,8 +4,9 @@
  * appear too high relative to the text. When OUR icon is present we switch
  * the row to `align-items: center` so icon and text track each other no
  * matter the icon size. Folders' native collapse arrow is position:absolute
- * so it isn't a flex child and is unaffected. */
-.tree-item-self:has(.inventexplorer-icon) {
+ * so it isn't a flex child and is unaffected. The plugin marks such rows with
+ * a class rather than a :has() rule, which re-evaluates on every DOM change. */
+.tree-item-self.inventexplorer-has-icon {
 	align-items: center;
 }
 

@@ -49,6 +49,9 @@ export interface LicenseHost {
 	license: LicenseState;
 	saveLicense(): Promise<void>;
 	refreshAll(): void;
+	/** Per-device, per-vault storage (Obsidian's App.loadLocalStorage). */
+	loadLocal(key: string): string | null;
+	saveLocal(key: string, value: string): void;
 }
 
 export interface Stamp {
@@ -149,7 +152,7 @@ function storedRaws(host: LicenseHost): string[] {
 	const out: string[] = [];
 	if (host.license.seed) out.push(host.license.seed);
 	try {
-		const ls = window.localStorage.getItem(LS_SEED);
+		const ls = host.loadLocal(LS_SEED);
 		if (ls) out.push(ls);
 	} catch {
 		/* storage unavailable */
@@ -177,7 +180,7 @@ async function storeStamp(host: LicenseHost, stamp: Stamp): Promise<void> {
 	const raw = encodeStamp(stamp);
 	host.license.seed = raw;
 	try {
-		window.localStorage.setItem(LS_SEED, raw);
+		host.saveLocal(LS_SEED, raw);
 	} catch {
 		/* storage unavailable */
 	}
@@ -255,7 +258,7 @@ export async function fetchStanding(
 	// freshness window. Legacy V1 is only read from local storage above.
 	if (Math.abs(Math.floor(Date.now() / 1000) - stamp.ts) > 300) return "offline";
 	try {
-		window.localStorage.setItem(LS_CHECKED, String(Date.now()));
+		host.saveLocal(LS_CHECKED, String(Date.now()));
 	} catch {
 		/* ignore */
 	}
@@ -338,9 +341,9 @@ export async function deactivateAccount(host: LicenseHost): Promise<void> {
 	host.refreshAll();
 }
 
-function lastCheckedAt(): number {
+function lastCheckedAt(host: LicenseHost): number {
 	try {
-		return parseInt(window.localStorage.getItem(LS_CHECKED) || "0", 10) || 0;
+		return parseInt(host.loadLocal(LS_CHECKED) || "0", 10) || 0;
 	} catch {
 		return 0; // unreadable storage reads as "never checked", so a check is due
 	}
@@ -372,13 +375,13 @@ function scheduleConfirmation(host: LicenseHost, delay: number = FIRST_RETRY_MS)
 	confirmTimer = window.setTimeout(() => {
 		confirmTimer = null;
 		if (!host.license.email) return; // account removed meanwhile
-		const before = lastCheckedAt();
+		const before = lastCheckedAt(host);
 		// A check that throws is a check that did not confirm — swallow it and
 		// re-arm, or one bad round trip would end the chain for good.
 		void checkLicenseNow(host)
 			.catch(() => undefined)
 			.then(() => {
-				if (lastCheckedAt() > before) return; // confirmed
+				if (lastCheckedAt(host) > before) return; // confirmed
 				scheduleConfirmation(host, RETRY_EVERY_MS);
 			});
 	}, delay);
@@ -386,7 +389,7 @@ function scheduleConfirmation(host: LicenseHost, delay: number = FIRST_RETRY_MS)
 
 /** Once-a-day scheduler (per device). Returns a stop function. */
 export function startLicenseCheck(host: LicenseHost): () => void {
-	const due = (): boolean => Date.now() - lastCheckedAt() >= CHECK_EVERY_MS;
+	const due = (): boolean => Date.now() - lastCheckedAt(host) >= CHECK_EVERY_MS;
 	// No navigator.onLine gate. That flag lies in both directions — a captive
 	// portal reports online, a sleep/VPN transition reports offline while the
 	// network works — and skipping the tick on it is exactly how a device
