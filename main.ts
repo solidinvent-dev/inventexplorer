@@ -2196,7 +2196,7 @@ class IconPickerModal extends Modal {
 		this.renderGrid(); // shows spinner
 
 		void this.plugin.getIconSet(setId).then((data) => {
-			if (!this.isOpen) return; // modal closed while loading
+			if (!this.isShowing) return; // modal closed while loading
 			this.extLoading = false;
 			if (data) {
 				this.extData = data;
@@ -2349,7 +2349,9 @@ class IconPickerModal extends Modal {
 		return cell;
 	}
 
-	get isOpen(): boolean {
+	// Not named `isOpen`: Obsidian 1.14 assigns `this.isOpen` in the Modal
+	// constructor, and a getter of that name made the picker throw on open.
+	private get isShowing(): boolean {
 		return this.contentEl.isConnected;
 	}
 

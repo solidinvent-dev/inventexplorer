@@ -1,6 +1,6 @@
 {
   "name": "inventexplorer",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "Add custom icons and colors next to file and folder names in the file explorer.",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
