@@ -6,6 +6,12 @@ icons from Lucide, Tabler, Boxicons and Phosphor, plus every emoji.
 
 **Website and documentation: https://inventexplorer.solidinvent.pl**
 
+![File explorer with custom icons and colours on files and folders](images/explorer.jpg)
+
+| Icon picker | Path masks | Text style |
+| --- | --- | --- |
+| ![Searching thousands of icons](images/icon-picker.jpg) | ![Regex masks that style many paths at once](images/masks.jpg) | ![Per-item text colour and style](images/text-style.jpg) |
+
 This repository holds the plugin's source code and its releases. **InventExplorer
 is source-available, not open source**: you can read the code, audit what it
 does and build it for your own use, under the [EULA](LICENSE). Each release
