@@ -3525,6 +3525,16 @@ class InventExplorerSettingTab extends PluginSettingTab {
 				`Phosphor (19,290 icons), any CSS colour, global defaults, text styling ` +
 				`and explorer styling.`,
 		});
+		// The website keeps ?ref= for the session and hands it to Paddle with a
+		// purchase, so a sale shows it came from here.
+		new Setting(containerEl)
+			.setName("Get Pro")
+			.setDesc("One payment, no subscription. Opens the pricing on the website.")
+			.addButton((b) =>
+				b.setButtonText("See pricing").onClick(() => {
+					window.open("https://inventexplorer.solidinvent.pl/?ref=plugin-settings#pricing", "_blank");
+				}),
+			);
 
 		let email = "";
 		let key = "";

@@ -1,7 +1,7 @@
 {
   "name": "inventexplorer",
-  "version": "1.1.10",
-  "description": "Add custom icons and colors next to file and folder names in the file explorer.",
+  "version": "1.1.11",
+  "description": "Add file and folder icons, colors and text styles to the file explorer. Lucide, Tabler, Boxicons, Phosphor and emoji icons, with regex rules that style many paths at once.",
   "private": true,
   "license": "SEE LICENSE IN LICENSE",
   "scripts": {
