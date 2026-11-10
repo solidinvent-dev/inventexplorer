@@ -118,6 +118,10 @@
 	margin-bottom: 8px;
 }
 
+.inventexplorer-status-link {
+	color: var(--text-accent);
+}
+
 .inventexplorer-grid {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));

@@ -168,6 +168,15 @@ function proNotice(what: string): void {
 	);
 }
 
+/**
+ * The pricing section of the product site. `ref` names the place in the plugin
+ * the click came from; the site keeps it for the session and passes it to the
+ * checkout, so a sale says which nudge led to it.
+ */
+function proUrl(ref: string): string {
+	return `https://inventexplorer.solidinvent.pl/?ref=${ref}#pricing`;
+}
+
 /** Small "PRO" chip appended to a tiered control's label. */
 function proChip(el: HTMLElement): void {
 	el.createSpan({ cls: "inventexplorer-pro-chip", text: "PRO" });
@@ -2300,6 +2309,18 @@ class IconPickerModal extends Modal {
 			(filtered.length > slice.length ? ` — first ${slice.length} shown` : "") +
 			(locked ? " · Pro set (browsing is free)" : ""),
 		);
+		// The one place a free user is looking at icons they cannot pick yet,
+		// so the way to unlock them sits right in the status line, quietly.
+		if (locked) {
+			this.statusEl.appendText(" · ");
+			const url = proUrl("plugin-picker");
+			this.statusEl
+				.createEl("a", { text: "See pricing", href: url, cls: "inventexplorer-status-link" })
+				.addEventListener("click", (e) => {
+					e.preventDefault();
+					window.open(url, "_blank");
+				});
+		}
 		for (const [name, svg] of slice) {
 			const key = `${this.activeIconSet}:${name}`;
 			const cell = this.makeCell(name, key === this.currentIcon);
@@ -3532,7 +3553,7 @@ class InventExplorerSettingTab extends PluginSettingTab {
 			.setDesc("One payment, no subscription. Opens the pricing on the website.")
 			.addButton((b) =>
 				b.setButtonText("See pricing").onClick(() => {
-					window.open("https://inventexplorer.solidinvent.pl/?ref=plugin-settings#pricing", "_blank");
+					window.open(proUrl("plugin-settings"), "_blank");
 				}),
 			);
 
